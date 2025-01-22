@@ -2,6 +2,7 @@ import json
 from importlib import import_module
 from typing import Dict, Iterator, List, Optional, Union
 
+import dashscope
 import json5
 
 from qwen_agent import Agent
@@ -13,6 +14,7 @@ from qwen_agent.settings import (DEFAULT_MAX_REF_TOKEN, DEFAULT_PARSER_PAGE_SIZE
 from qwen_agent.tools import BaseTool
 from qwen_agent.tools.simple_doc_parser import PARSER_SUPPORTED_FILE_TYPES
 from qwen_agent.utils.utils import extract_files_from_messages, extract_text_from_message, get_file_type
+from CosyVoice_tools import *
 
 
 class Memory(Agent):
@@ -125,6 +127,33 @@ class Memory(Agent):
                 content = json.dumps(content, ensure_ascii=False, indent=4)
 
             yield [Message(role=ASSISTANT, content=content, name='memory')]
+
+            ##在此处尝试添加语音阅读文字的代码
+            print(content)
+            print(1111)
+            story_obj=json.loads(content)
+            print(2222)
+            dashscope.api_key=""
+            model=""
+            voice=""
+            callback=Callback()
+            synthesizer = SpeechSynthesizer(
+                model=model,
+                voice=voice,
+                format=AudioFormat.PCM_22050HZ_MONO_16BIT,
+                callback=callback,
+            )
+            story_text=story_obj[0].get("text")[0]
+            text_array=story_text.split("\u3000\u3000")  ##起点中文获取的文章数据有此特殊符号
+            if(len(text_array)>=2):
+                text_array=text_array[1:]
+
+            for text in text_array:
+                synthesizer.streaming_call(text)
+                time.sleep(0.5)
+            synthesizer.streaming_complete()
+            print('requestId: ', synthesizer.get_last_request_id())
+
 
     def get_rag_files(self, messages: List[Message]):
         session_files = extract_files_from_messages(messages, include_images=False)

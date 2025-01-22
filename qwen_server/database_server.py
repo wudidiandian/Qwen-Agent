@@ -91,7 +91,7 @@ def cache_page(**kwargs):
         # rm history
         save_history(None, url, history_dir)
     try:
-        *_, last = mem.run([{'role': 'user', 'content': [{'file': url}]}])
+        *_, last = mem.run([{'role': 'user', 'content': [{'file': url}]}])   ##调用memory类操作缓存的数据
         title = get_basename_from_url(url)
         save_browsing_meta_data(url, title, meta_file)
     except Exception:
@@ -106,7 +106,7 @@ async def web_listening(request: Request):
     if msg_type == 'change_checkbox':
         rsp = change_checkbox_state(data['ckid'])
     elif msg_type == 'cache':
-        cache_obj = multiprocessing.Process(target=cache_page, kwargs=data)
+        cache_obj = multiprocessing.Process(target=cache_page, kwargs=data)   ##进入缓存页面数据操作
         cache_obj.start()
         # rsp = cache_data(data, cache_file)
         rsp = 'caching'

@@ -3,9 +3,7 @@
 import json
 import os
 import urllib.parse
-
 import json5
-
 from qwen_agent.agents import Assistant
 from qwen_agent.gui import WebUI
 from qwen_agent.tools.base import BaseTool, register_tool
